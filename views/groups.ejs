@@ -27,15 +27,15 @@
     <div  style="padding: 40px;" class="whole container">
         <h3 class="mb-3 text-center">All Groups</h3>
         <% groups.forEach(function(group){ %>
-            <div style="border-radius: 20px;" class="card mb-3 bg-dark text-light bg-gradient shadow">   
+            <div style="border-radius: 20px; padding: 30px;" class="card mb-3 bg-dark text-light bg-gradient shadow">   
                 <div class="mb-3">
-                <h3 class="mb-2">Group Name - <%= group.groupName %></h3>
-                <h3 class="mb-2">Group ID - <%= group._id %></h3>
+                <h5 class="mb-2">Group Name - <%= group.groupName %></h5>
+                <h5 class="mb-2">Group ID - <%= group._id %></h5>
                 </div>
                 <p class="mb-2">Group Join Link <br> 
                 </p>
-                <p>https://splitmates.cyclic.cloud/join-group?groupID=<%= group._id %>
-                </p>
+                <a href="https://splitmates.cyclic.cloud/join-group?groupID=<%= group._id %>">https://splitmates.cyclic.cloud/join-group?groupID=<%= group._id %>
+                </a>
             </div>
         <% }) %>
     </div>

@@ -124,7 +124,7 @@ app.get('/auth/login' , (req,res) => {
 app.get('/groups' , (req,res) =>{
   if (req.isAuthenticated()){
     if (req.user.userID === process.env.SUPER_USER){
-      Group.findOne({} , function(err , foundGroups){
+      Group.find({} , function(err , foundGroups){
         if (!err) {
           res.render("groups" , {groups : foundGroups});
         } else {
