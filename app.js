@@ -121,6 +121,24 @@ app.get('/auth/login' , (req,res) => {
   }
 });
 
+app.get('/groups' , (req,res) =>{
+  if (req.isAuthenticated()){
+    if (req.user.userID === process.env.SUPER_USER){
+      Group.findOne({} , function(err , foundGroups){
+        if (!err) {
+          res.render("groups" , {groups : foundGroups});
+        } else {
+          console.log(err);
+        }
+      });
+    } else {
+      res.redirect('/');
+    }
+    } else {
+      res.redirect('/');
+  }
+})
+
 app.get('/account' , (req,res) =>{
    if(req.isAuthenticated()){
     res.render("account" , {user : req.user});
