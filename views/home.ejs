@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#000000" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>SplitMate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;800&display=swap" rel="stylesheet">
+<link type="image/png" sizes="32x32" rel="icon" href="img/money.png">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/3ea55f06b5.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+          <a style="font-weight: 600;" class="navbar-brand" href="/">
+            <img src="img/money.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+            SplitMate
+          </a>
+          <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="/">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/account">Account</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    <div class="mt-3 container text-center">
+        <h1 style="font-weight: bold;"><%= groupName %></h1>
+        <h2>Expenses</h2>
+    </div>
+    
+    <div class="whole" style="padding: 40px;">
+        <div style="margin-bottom: 4rem;">
+            <a href="/my-expenses?groupID=<%= groupID %>"><button class="btn btn-sm btn-success"><i class="fa-solid fa-money-bills" style="color: #000000;"></i> My expenses</button></a>
+            <a style="float: right;" href="/add-expense?groupID=<%= groupID %>"><button class="btn btn-sm btn-success"><i class="fa-solid fa-pen-to-square" style="color: #000000; margin-right: 5px;"></i> Add Expense</button></a>
+        </div>
+        <h1 class="mt-5 mb-4">Not Settled</h1>
+        <% if ( Expenses.length === 0){ %>
+            <p style="font-size: 15px;">No expenses found!</p>
+        <% } else { %>
+            <% Expenses.forEach(function(expense){ %>
+                <div class="card mb-4 bg-danger bg-gradient w-100">
+                    <div class="card-body">
+                      <h5 style="font-weight: bold;" class="card-title"><%= expense.expenseName %>  <span style="float: right;"> &#8377;<%= expense.expenseTotalAmount %></span></h5>
+                      <p class="mb-1 card-text">Paid by <%= expense.addedByName.match(/^\S+/)[0] %></p>
+                      <span>You owe <span style="font-weight: bold;">&#8377;<%= expense.eachShare %></span> to <%= expense.addedByName.match(/^\S+/)[0] %> <br></span>
+                      <form method="post" action="/settle-expense">
+                        <input type="hidden" name="expenseID" value="<%= expense._id %>">
+                        <button style="float: right;" type="submit" class="btn btn-sm btn-dark" >Settle</button>
+                      </form>
+                      <% if (expense.paymentMethod != "NA") { %>
+                        <span class="mt-3 badge pill rounded-pill bg-dark"><%= expense.paymentMethod %></span>
+                      <% } %>
+                      
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+
+        <div>
+            <h1 class="mt-5 mb-3">Settled</h1>
+            <% if ( PaidExpenses.length === 0){ %>
+                <p style="font-size: 15px;">No expenses found!</p>
+            <% } else { %>
+                <% PaidExpenses.forEach(function(expense) { %>
+                    <div class="card mb-4 bg-success bg-gradient w-100">
+                        <div class="card-body">
+                        <h5 style="font-weight: bold;" class="card-title"><%= expense.expenseName %> <span style="float: right;"> &#8377;<%= expense.expenseTotalAmount %></span></h5>
+                        <p class="mb-1 card-text">Paid by <%= expense.addedByName.match(/^\S+/)[0] %></p>
+                        <span>You paid <span style="font-weight: bold;">&#8377;<%= expense.eachShare %></span> to <%= expense.addedByName.match(/^\S+/)[0] %> <br></span>
+                        <span class="mt-3 badge pill rounded-pill bg-dark"><%= expense.paymentMethod %></span>
+                        <span style="float: right;" >&#10003; Settled</span>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+        </div>
+    </div>
+    
+    <footer style="margin-top: 8rem;  margin-bottom: 2rem;" class="text-center">
+        <span>Made with ❤️ by Ashish</span>
+    </footer>
+</body>
+</html>

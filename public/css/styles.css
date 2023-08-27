@@ -1,0 +1,24 @@
+body{
+    background-color: #000;
+    color: rgb(244, 244, 244);
+    font-family: 'Montserrat', sans-serif;
+}
+.navbar-custom {
+    background-color: #000; 
+    border-bottom: 0.7px solid #363636 !important;
+
+}
+
+@media only screen and (min-width: 650px) {
+    .whole{
+        padding-left: 20% !important;
+        padding-right: 20% !important;
+    }
+}
+
+@media only screen and (min-width: 1000px) {
+    .whole{
+        padding-left: 20% !important;
+        padding-right: 20% !important;
+    }
+}

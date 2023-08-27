@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#000000" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>SplitMate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link type="image/png" sizes="32x32" rel="icon" href="img/money.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/3ea55f06b5.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+    <div class="container text-center">
+        <a style="color: white; text-decoration: none;" href="/">
+            <h1 style="font-weight: bold;" class="mt-5 display-4"><img style="width: 10vw;" src="img/money.png" alt="">
+                SplitMate</h1>
+        </a>
+    </div>
+    
+    <div class="whole" style="padding: 40px;">
+        
+        <div>
+            <h1 class="mt-1 mb-4 text-center">My Expenses</h1>
+            <h3 class="mt-5 mb-3">Unsettled by others</h3>
+            <% if (unPaidExpenses.length === 0) { %>
+                <p>No unsettled expenses found!</p>
+            <% } else { %>
+                <% unPaidExpenses.forEach(function(expense){ %>
+                    <div class="card mb-4 bg-primary bg-gradient w-100">
+                        <div class="card-body">
+                          <h5 style="font-weight: bold;" class="card-title"><%= expense.expenseName %> <span style="float: right;"> &#8377;<%= expense.expenseTotalAmount %></span></h5>
+                          <p class="mb-1 card-text">Paid by You</p>
+                          <% if(expense.splitTo === "All"){ %>
+                            <span>You owe <span style="font-weight: bold;">&#8377;<%= expense.eachShare * (expense.splitByNum - 1) %></span> from All<br></span>
+                          <% } else { %>
+                          <span>You owe <span style="font-weight: bold;">&#8377;<%= expense.eachShare %></span> from <%= expense.addedByName.match(/^\S+/)[0] %> <br></span>
+                          <% } %>
+                          <form action="/delete-expense" method="post">
+                            <input type="hidden" name="expenseID" value="<%= expense._id %>">
+                            <input type="hidden" name="groupID" value="<%= expense.groupID %>">
+                            <button type="submit" style="float: right;" class="btn shadow-none"><i class="fa-solid fa-trash-can" style="color: #db0f0f;"></i></button>
+                          </form>
+                          <% if (expense.paymentMethod != "NA") { %>
+                            <span class="mt-3 badge pill rounded-pill bg-dark"><%= expense.paymentMethod %></span>
+                          <% } %>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } %>
+            
+            <h3 class="mt-5 mb-3">Settled by others</h3>
+            <% if (paidExpenses.length === 0) { %>
+                <p>No settled expenses found!</p>
+            <% } else {  %>
+                <% paidExpenses.forEach(function(expense){ %>
+                    <div class="card mb-4 bg-success bg-gradient w-100">
+                        <div class="card-body">
+                        <h5 style="font-weight: bold;" class="card-title"><%= expense.expenseName %> <span style="float: right;"> &#8377;<%= expense.expenseTotalAmount %></span></h5>
+                        <p class="mb-1 card-text">Paid by You</p>
+                        <% if(expense.splitTo === "All"){ %>
+                            <span>You got <span style="font-weight: bold;">&#8377;<%= expense.eachShare * (expense.splitByNum - 1) %></span> from All<br></span>
+                        <% } else { %>
+                          <span>You got <span style="font-weight: bold;">&#8377;<%= expense.eachShare %></span> from <%= expense.addedByName.match(/^\S+/)[0] %> <br></span>
+                        <% } %>
+                        <form action="/delete-expense" method="post">
+                            <input type="hidden" name="expenseID" value="<%= expense._id %>">
+                            <input type="hidden" name="groupID" value="<%= expense.groupID %>">
+                            <button type="submit" style="float: right;" class="btn shadow-none"><i class="fa-solid fa-trash-can" style="color: #db0f0f;"></i></button>
+                          </form>
+                        <% if (expense.paymentMethod != "NA") { %>
+                            <span class="mt-3 badge pill rounded-pill bg-dark"><%= expense.paymentMethod %></span>
+                        <% } %>
+                    </div>
+                    </div>
+                <% }); %>
+            <% } %>
+
+            
+
+            
+
+        </div>
+    </div>
+    
+    <footer style="margin-top: 8rem;  margin-bottom: 2rem;" class="text-center">
+        <span>Made with ❤️ by Ashish</span>
+    </footer>
+</body>
+</html>
