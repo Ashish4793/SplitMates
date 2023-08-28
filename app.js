@@ -154,7 +154,12 @@ app.get('/join-group' , (req,res)=>{
     Group.findOne({_id : req.query.groupID} , (err , foundGroup) => {
       if (!err){
         if (foundGroup != null) {
-          res.render("join-group" , {foundGroup : foundGroup , error : false})
+          const isCurrentUserMember = foundGroup.members.some(member => member.memberID === req.user._id);
+          if (isCurrentUserMember){
+            res.redirect('/');
+          } else {
+            res.render("join-group" , {foundGroup : foundGroup , error : false})
+          }
         } else {
           res.render("join-group" , {foundGroup : null , error : true})
         }
