@@ -11,7 +11,9 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5/dark.css" />    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://kit.fontawesome.com/3ea55f06b5.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/styles.css">
 
@@ -25,9 +27,11 @@
     </div>
     
     <div class="whole" style="padding: 40px;">
-        
+        <h1 class="mt-1 mb-3 text-center">My Expenses</h1>
+        <div style="margin-bottom: 4rem;">
+            <a style="float: right;" href="/add-expense?groupID=<%= groupID %>"><button class="btn btn-sm btn-success"><i class="fa-solid fa-pen-to-square" style="color: #000000; margin-right: 5px;"></i> Add Expense</button></a>
+        </div>
         <div>
-            <h1 class="mt-1 mb-4 text-center">My Expenses</h1>
             <h3 class="mt-5 mb-3">Unsettled by others</h3>
             <% if (unPaidExpenses.length === 0) { %>
                 <p>No unsettled expenses found!</p>
@@ -38,11 +42,17 @@
                           <h5 style="font-weight: bold;" class="card-title"><%= expense.expenseName %> <span style="float: right;"> &#8377;<%= expense.expenseTotalAmount %></span></h5>
                           <p class="mb-1 card-text">Paid by You</p>
                           <% if(expense.splitTo === "All"){ %>
-                            <span>You owe <span style="font-weight: bold;">&#8377;<%= expense.eachShare * (expense.splitByNum - 1) %></span> from All<br></span>
+                            <% expense.paid_status.forEach(function(status){ %>
+                                <% if(status.status === "not paid"){ %>
+                                    <span style="font-size: 13px;">You owe <span style="font-weight: bold;">&#8377;<%= expense.eachShare  %></span> from <%= status.memberName.match(/^\S+/)[0] %><br></span>
+                                <% } else { %>
+                                    <span style="font-size: 13px;">&#10003; <%= status.memberName.match(/^\S+/)[0] %> Settled <span style="font-weight: bold;">&#8377;<%= expense.eachShare %></span><br></span>
+                                <% } %>
+                            <% }) %>
                           <% } else { %>
-                          <span>You owe <span style="font-weight: bold;">&#8377;<%= expense.eachShare %></span> from <%= expense.addedByName.match(/^\S+/)[0] %> <br></span>
+                          <span style="font-size: 13px;">You owe <span style="font-weight: bold;">&#8377;<%= expense.eachShare %></span> from <%= expense.splitTo.match(/^\S+/)[0] %> <br></span>
                           <% } %>
-                          <form action="/delete-expense" method="post">
+                          <form class="dynamic-form" action="/delete-expense" method="post">
                             <input type="hidden" name="expenseID" value="<%= expense._id %>">
                             <input type="hidden" name="groupID" value="<%= expense.groupID %>">
                             <button type="submit" style="float: right;" class="btn shadow-none"><i class="fa-solid fa-trash-can" style="color: #db0f0f;"></i></button>
@@ -65,11 +75,13 @@
                         <h5 style="font-weight: bold;" class="card-title"><%= expense.expenseName %> <span style="float: right;"> &#8377;<%= expense.expenseTotalAmount %></span></h5>
                         <p class="mb-1 card-text">Paid by You</p>
                         <% if(expense.splitTo === "All"){ %>
-                            <span>You got <span style="font-weight: bold;">&#8377;<%= expense.eachShare * (expense.splitByNum - 1) %></span> from All<br></span>
+                            <% expense.paid_status.forEach(function(status){ %>
+                                <span style="font-size: 13px;">&#10003; <%= status.memberName.match(/^\S+/)[0] %> Settled <span style="font-weight: bold;">&#8377;<%= expense.eachShare %></span><br></span>
+                            <% }) %>
                         <% } else { %>
-                          <span>You got <span style="font-weight: bold;">&#8377;<%= expense.eachShare %></span> from <%= expense.addedByName.match(/^\S+/)[0] %> <br></span>
+                          <span style="font-size: 13px;">&#10003; <%= expense.splitTo.match(/^\S+/)[0] %> Settled <span style="font-weight: bold;">&#8377;<%= expense.eachShare %></span><br></span>
                         <% } %>
-                        <form action="/delete-expense" method="post">
+                        <form class="dynamic-form" action="/delete-expense" method="post">
                             <input type="hidden" name="expenseID" value="<%= expense._id %>">
                             <input type="hidden" name="groupID" value="<%= expense.groupID %>">
                             <button type="submit" style="float: right;" class="btn shadow-none"><i class="fa-solid fa-trash-can" style="color: #db0f0f;"></i></button>
@@ -93,4 +105,30 @@
         <span>Made with ❤️ by Ashish</span>
     </footer>
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const forms = document.querySelectorAll(".dynamic-form");
+  
+      forms.forEach((form) => {
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+  
+          Swal.fire({
+            title: "Are you sure?",
+            text: "You are about to delete the expense",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "rgb(207, 25, 25)",   
+            confirmButtonText: "Delete",
+            cancelButtonText: "Cancel",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              form.submit();
+            }
+          });
+        });
+      });
+    });
+  </script>
+  
 </html>

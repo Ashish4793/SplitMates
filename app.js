@@ -81,6 +81,7 @@ const expenseSchema = new mongoose.Schema({
   addedByName : {type : String , required : true},
   paid_status : [{
     memberID : {type : String , required : true},
+    memberName : {type : String , required : true},
     status : {type : String , default : "not paid"}
   }]
 });
@@ -289,6 +290,12 @@ app.post("/add-expense" , (req,res) => {
       if (!err) {
         if (req.body.splitTo === "All"){
           const memberIDs = foundGroup.members.map(member => member.memberID).filter(memberID => memberID !== req.user._id);
+          const memberData = foundGroup.members
+          .filter(member => member.memberID !== req.user._id)
+          .map(member => ({ memberID: member.memberID, memberName: member.memberName }));
+        
+        console.log(memberData);
+        
           const newExpense = new Expense({
             groupID : req.body.groupID,
             expenseName : req.body.expenseName,
@@ -301,10 +308,12 @@ app.post("/add-expense" , (req,res) => {
             addedByName : req.user.name,
             paid_status : [
               {
-              memberID : memberIDs[0],
+              memberID : memberData[0].memberID,
+              memberName : memberData[0].memberName
               },
               {
-                memberID : memberIDs[1],
+                memberID : memberData[1].memberID,
+                memberName : memberData[1].memberName
               }    
           ]
           });
@@ -329,6 +338,7 @@ app.post("/add-expense" , (req,res) => {
             paid_status : [
               {
               memberID : req.body.splitTo,
+              memberName : req.body.mySelectText
               },   
           ]
           });
@@ -391,7 +401,7 @@ app.get("/my-expenses" , (req,res) => {
         const documentsWithAtLeastOneNotPaid = foundExpenses.filter(document => {
           return document.paid_status.some(statusObj => statusObj.status !== 'paid');
         });
-        res.render("my-expenses" , {unPaidExpenses : documentsWithAtLeastOneNotPaid, paidExpenses : documentsWithAllPaidStatus});
+        res.render("my-expenses" , {unPaidExpenses : documentsWithAtLeastOneNotPaid, paidExpenses : documentsWithAllPaidStatus , groupID : req.query.groupID});
       } else {
         console.log(err);
       }
